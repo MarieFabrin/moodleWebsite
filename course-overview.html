@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type='text/javascript' src=></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vue starter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body id="app">
+    <div>
+        <header>
+            <div>
+                <a href="index.html" > <img id="logo" src="seaLogo.png" alt=""></a>
+            </div>
+
+            <div class="userID"></div>
+        </header>
+
+
+        <section class="body">
+            <section class="weekOverview">
+                <article class="top">
+                    <h1 class="header"> {{ moodleData.course_name }} </h1>
+                    <div class="line"></div>
+                    <article class="buttonHeader">
+                        <div class="searchFilter">
+                            <input class="button" type="text" placeholder=" Søg">
+                            <button class="button"> <img id="icon" src="filter.png" alt="">Filter</button>
+                        </div>
+                        <a href="index.html">
+                        <button class="goBack" v-if="!selectedDay"> <img id="icon" src="backArrow.png"
+                                alt="">tilbage</button>
+                        </a>
+                    </article>
+                </article>
+                <section class="all">
+                    <section v-for="content of moodleData.weeks" @click="openWeek(content.week_number)"
+                        v-if="!selectedDay">
+                        <section class="allWeeks">
+                            <div class="circle" :class="{'currentcircle' : content.is_current === true}">
+                                <h6 :class="{'colour' : content.is_current === true}">{{content.week_number}} </h2>
+                            </div>
+                            <article>
+                                <h3> {{ content.week_label }} </h3>
+                                <div class="days">
+                                    <p v-for="day of content.days"> {{ day.day_name }} </p>
+                                    <img id="icon" v-if="content.week_number != selectedWeek" class="daysArrow" src="downArrow.png" alt="Open">
+                                    <img id="icon" v-if="content.week_number === selectedWeek" class="daysArrow" src="upArrow.png" alt="Close">
+                                </div>
+                            </article>
+                        </section>
+
+                        <article class="allDays" v-for="daily of content.days" @click="selectedThing(daily)"
+                            v-if="content.week_number === selectedWeek">
+                            <div>
+                                <section class="dayHeader">
+                                    <h2> {{ daily.day_name }} </h2>
+                                    <p class="grayText">Uge {{ content.week_number }}</p>
+                                </section>
+                                <div class="line"></div>
+
+                            </div>
+                            <article class="indent">
+                                <div class="dayTitles" v-for="lists of daily.items">
+                                    <p> {{ lists.title }} </p>
+                                </div>
+
+                            </article>
+
+                            <div id="button">
+                                <p id="icon" class="grayText">Gå til lektion <img id="icon" src="moreArrow.png" alt=""></p> <img
+                                    src="arrow.png" alt="">
+                            </div>
+                        </article>
+                    </section>
+                </section>
+            </section>
+
+            <section v-if="selectedDay">
+                <button id="button2" class="goBack" @click="goBack()"> <img  id="icon" src="backArrow.png" alt="">tilbage</button>
+                <article class="lesson">
+
+                    <div class="dayHeader">
+                        <h2> {{ selectedDay.day_name }} </h2>
+                        <p class="grayText"> {{ selectedDay.date }} </p>
+                    </div>
+                    <div v-for="lesson of selectedDay.items">
+                        <article class="indent">
+                            <p>{{ lesson.title}} </p>
+
+                             <p v-html="lesson.content_html"></p>
+                        </article>
+                        <div class="line"></div>
+                    </div>
+                </article>
+            </section>
+        </section>
+        </section>
+
+        <footer>
+          <a href="index.html"> <img id="Bigicon" src="homebtn.png" alt="Home"> </a>
+            <a href="#"> <img id="Bigicon" src="messagebtn.png" alt="Beskeder"></a>
+            <a href="#"> <img id="Bigicon" src="homeworkbtn.png" alt="Lektier"></a> 
+        </footer>
+    </div>
+
+
+    <!-- Vue import (skal komme før Vue.createApp) -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        Vue.createApp({
+            data() {
+                return {
+                    moodleData: [
+                        {
+                        }
+                    ],
+
+                    selectedDay: null,
+                    selectedWeek: null
+                }
+            },
+
+            created() {
+                this.getData()
+            },
+
+            methods: {
+                async getData() {
+                    let file = await fetch('https://lms.mironpingel.dk/')
+                    let data = await file.json()
+
+                    this.moodleData = data
+                },
+
+                selectedThing(selectedDay) {
+                    this.selectedDay = selectedDay
+                },
+
+                openWeek(weekNumber) {
+                    this.selectedWeek = weekNumber
+                },
+
+                goBack() {
+                    this.selectedDay = null
+                },
+
+                goBackWeek() {
+                    this.selectedWeek = null
+                }
+
+            }
+        }).mount('#app')
+    </script>
+
+
+</body>
+
+</html>
